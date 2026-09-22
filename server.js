@@ -19,6 +19,20 @@ app.set('views', './src/views');
 // Serve static files from the public folder
 app.use(express.static('public'));
 
+// Middleware to log all incoming requests
+app.use((req, res, next) => {
+    if (nodeEnv === 'development') {
+        console.log(`${req.method} ${req.url}`);
+    }
+    next();
+});
+
+// Middleware to make NODE_ENV available to all templates
+app.use((req, res, next) => {
+    res.locals.NODE_ENV = nodeEnv;
+    next();
+});
+
 // Home page
 app.get('/', async (req, res) => {
     const title = 'Home';
