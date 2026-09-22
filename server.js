@@ -24,6 +24,7 @@ app.use((req, res, next) => {
     if (nodeEnv === 'development') {
         console.log(`${req.method} ${req.url}`);
     }
+
     next();
 });
 
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 // Home page
 app.get('/', async (req, res) => {
     const title = 'Home';
+
     res.render('home', { title });
 });
 
@@ -54,6 +56,7 @@ app.get('/projects', async (req, res) => {
 
     res.render('projects', { title, projects });
 });
+
 // Categories page
 app.get('/categories', async (req, res) => {
     const categories = await getAllCategories();
@@ -62,10 +65,44 @@ app.get('/categories', async (req, res) => {
     res.render('categories', { title, categories });
 });
 
+// Test route for 500 errors
+app.get('/test-error', (req, res, next) => {
+    const err = new Error('This is a test error');
+    err.status = 500;
+
+    next(err);
+});
+
+// Catch-all route for 404 errors
+app.use((req, res, next) => {
+    const err = new Error('Page Not Found');
+    err.status = 404;
+
+    next(err);
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Error occurred:', err.message);
+    console.error('Stack trace:', err.stack);
+
+    const status = err.status || 500;
+    const template = status === 404 ? '404' : '500';
+
+    const context = {
+        title: status === 404 ? 'Page Not Found' : 'Server Error',
+        error: err.message,
+        stack: err.stack
+    };
+
+    res.status(status).render(`errors/${template}`, context);
+});
+
 // Start the server
 app.listen(port, async () => {
     try {
         await testConnection();
+
         console.log(`Server is running at http://127.0.0.1:${port}`);
         console.log(`Environment: ${nodeEnv}`);
     } catch (error) {
