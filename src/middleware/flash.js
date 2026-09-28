@@ -6,15 +6,17 @@
  * Messages are stored in the session and organized by type.
  */
 
-const flashMiddleware = (req, res, next) => {
-    req.flash = function (type, message) {
+const emptyMessages = () => ({
+    success: [],
+    error: [],
+    warning: [],
+    info: []
+});
+
+const flash = (req, res, next) => {
+    req.flash = (type, message) => {
         if (!req.session.flash) {
-            req.session.flash = {
-                success: [],
-                error: [],
-                warning: [],
-                info: []
-            };
+            req.session.flash = emptyMessages();
         }
 
         // Store a new message
@@ -37,36 +39,20 @@ const flashMiddleware = (req, res, next) => {
         }
 
         // Get all messages
-        const allMessages = req.session.flash || {
-            success: [],
-            error: [],
-            warning: [],
-            info: []
-        };
+        const allMessages = req.session.flash;
 
-        req.session.flash = {
-            success: [],
-            error: [],
-            warning: [],
-            info: []
-        };
+        req.session.flash = emptyMessages();
 
         return allMessages;
     };
 
+    // Make existing flash messages available to EJS
+    res.locals.messages = req.session.flash || emptyMessages();
+
+    // Clear messages after making them available to the view
+    req.session.flash = emptyMessages();
+
     next();
-};
-
-const flashLocals = (req, res, next) => {
-    res.locals.flash = req.flash;
-
-    next();
-};
-
-const flash = (req, res, next) => {
-    flashMiddleware(req, res, () => {
-        flashLocals(req, res, next);
-    });
 };
 
 export default flash;
