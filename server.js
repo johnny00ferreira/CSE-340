@@ -1,6 +1,9 @@
 import express from 'express';
+import session from 'express-session';
+
 import { testConnection } from './src/models/db.js';
 import router from './src/routes.js';
+import flash from './src/middleware/flash.js';
 
 // Define the application environment
 const nodeEnv = process.env.NODE_ENV?.toLowerCase() || 'production';
@@ -8,11 +11,31 @@ const nodeEnv = process.env.NODE_ENV?.toLowerCase() || 'production';
 // Define the port number the server will listen on
 const port = process.env.PORT || 3000;
 
+// Load the session secret from environment variables
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
 const app = express();
 
 // Configure EJS
 app.set('view engine', 'ejs');
 app.set('views', './src/views');
+
+// Set up session management
+app.use(session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 60 * 60 * 1000
+    }
+}));
+
+// Use flash message middleware
+app.use(flash);
+
+// Allow Express to receive and process POST data
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Serve static files from the public folder
 app.use(express.static('public'));
