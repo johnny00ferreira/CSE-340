@@ -42,7 +42,8 @@ import {
     processLogout,
     requireLogin,
     showDashboard,
-    requireRole
+    requireRole,
+    showUsersPage
 } from './controllers/users.js';
 
 import { testErrorPage } from './controllers/errors.js';
@@ -161,6 +162,9 @@ router.get('/logout', processLogout);
 
 // Protected dashboard route
 router.get('/dashboard', requireLogin, showDashboard);
+
+// Protected users page
+router.get('/users', requireRole('admin'), showUsersPage);
 
 // Error-handling route
 router.get('/test-error', testErrorPage);
