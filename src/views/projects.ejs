@@ -7,41 +7,43 @@
 
         <h2>Upcoming Service Projects</h2>
 
-        <p>
-            <a href="/new-project">Add a New Service Project</a>
-        </p>
+        <% if (user && user.role_name==='admin' ) { %>
+            <p>
+                <a href="/new-project">Add a New Service Project</a>
+            </p>
+            <% } %>
 
-        <ul class="project-list">
-            <% projects.forEach(project=> { %>
-                <li>
-                    <strong>
-                        <%= new Date(project.date).toLocaleDateString('en-US', { timeZone: 'UTC' , year: 'numeric' ,
-                            month: 'short' , day: 'numeric' }) %>:
-                    </strong>
+                <ul class="project-list">
+                    <% projects.forEach(project=> { %>
+                        <li>
+                            <strong>
+                                <%= new Date(project.date).toLocaleDateString('en-US', { timeZone: 'UTC' ,
+                                    year: 'numeric' , month: 'short' , day: 'numeric' }) %>:
+                            </strong>
 
-                    <a href="/project/<%= project.project_id %>">
-                        <%= project.title %>
-                    </a>
+                            <a href="/project/<%= project.project_id %>">
+                                <%= project.title %>
+                            </a>
 
-                    (
-                    <em>
-                        <a href="/organization/<%= project.organization_id %>">
-                            <%= project.organization_name %>
-                        </a>
-                    </em>
-                    )
+                            (
+                            <em>
+                                <a href="/organization/<%= project.organization_id %>">
+                                    <%= project.organization_name %>
+                                </a>
+                            </em>
+                            )
 
-                    <p>
-                        <%= project.description %>
-                    </p>
+                            <p>
+                                <%= project.description %>
+                            </p>
 
-                    <p>
-                        <strong>Location:</strong>
-                        <%= project.location %>
-                    </p>
-                </li>
-                <% }); %>
-        </ul>
+                            <p>
+                                <strong>Location:</strong>
+                                <%= project.location %>
+                            </p>
+                        </li>
+                        <% }); %>
+                </ul>
     </main>
 
     <%- include('partials/footer') %>
